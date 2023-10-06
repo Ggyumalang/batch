@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    container_name: 'batch-mysql'
+    environment:
+      - 'MYSQL_DATABASE=test'
+      - 'MYSQL_ROOT_PASSWORD=r1234'
+      - 'MYSQL_USER=testUser'
+      - 'MYSQL_PASSWORD=1234'
+    ports:
+      - '3304:3306'
