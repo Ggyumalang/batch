@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
@@ -20,13 +21,12 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManagerFactory;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-@ConditionalOnProperty(prefix = "spring.batch.job", name = "names", havingValue = "SimpleChunkJob")
+@ConditionalOnProperty(prefix = "spring.batch.job", name = "names", havingValue = "simpleChunkJob")
 public class SimpleChunkConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -46,6 +46,7 @@ public class SimpleChunkConfig {
     }
 
     @Bean
+    @JobScope
     public Step simpleChunkStep() throws SQLException {
         return stepBuilderFactory.get("simpleChunkStep")
                 .<Member, MemberDTO>chunk(CHUNK_SIZE)
@@ -80,12 +81,9 @@ public class SimpleChunkConfig {
 
     @Bean
     public ItemWriter<MemberDTO> simpleWriter() {
-        return new ItemWriter<MemberDTO>() {
-            @Override
-            public void write(List<? extends MemberDTO> items) throws Exception {
-                log.info(">>> Started ItemWriter results : {}", items);
-                memberRepository.saveAll(items.stream().map(Member::fromDto).collect(Collectors.toList()));
-            }
+        return items -> {
+            log.info(">>> Started ItemWriter results : {}", items);
+            memberRepository.saveAll(items.stream().map(Member::fromDto).collect(Collectors.toList()));
         };
     }
 }

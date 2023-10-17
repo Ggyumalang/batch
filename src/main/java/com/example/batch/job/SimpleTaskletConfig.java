@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -20,7 +21,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-@ConditionalOnProperty(prefix = "spring.batch.job" , name = "names", havingValue = "SimpleTaskletJob")
+@ConditionalOnProperty(prefix = "spring.batch.job" , name = "names", havingValue = "simpleTaskletJob")
 public class SimpleTaskletConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -39,6 +40,7 @@ public class SimpleTaskletConfig {
 
     @Bean
     @Transactional
+    @JobScope
     public Step simpleTaskletStep() {
         return stepBuilderFactory.get("simpleTaskletStep")
                 .tasklet((contribution, chunkContext) -> {
